@@ -1,6 +1,7 @@
 package com.apiTestRestAssured;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -10,8 +11,7 @@ import org.testng.annotations.Test;
 
 import java.util.Collections;
 
-import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.post;
+import static io.restassured.RestAssured.*;
 import static io.restassured.parsing.Parser.JSON;
 
 public class GetData {
@@ -34,32 +34,50 @@ public class GetData {
     @Test
     public void logInTest() {
 
+
         int code = RestAssured.given()
                 .auth().preemptive()
                 .basic("vvkishor", "Mymilky1")
                 .when()
-                .get("https://api.github.com")
+                .get("https://api.github.com/user")
                 .getStatusCode();
         System.out.println("Response Code from the Server is" + code);
         Assert.assertEquals(code, 200);
     }
 
    @Test
-    public void deleteGist() {
+    public void createGist() {
 
-        RestAssured.baseURI = "https://api.github.com/";
-        RequestSpecification httpRequest = RestAssured.given();
-        Response response = httpRequest.request(Method.DELETE, "gists/f091b617e390024cf070b20aaa759c23");
+       int code = RestAssured.given()
+                    .auth().preemptive()
+                    .basic("vvkishor", "Mymilky1")
+                    .when()
+                    .get("https://api.github.com/gists")
+                    .getStatusCode();
 
-        String responseBody = response.getBody().asString();
-        System.out.println("Resonse Body is:" + responseBody);
+       JSONObject json = new JSONObject();
+       json.put("files","Question3Test");
+       json.put("description","fromApiChannel");
+       json.put("public","true");
 
-        int statusCode = response.getStatusCode();
-        System.out.println("Status code is:" + statusCode);
-        Assert.assertEquals(statusCode, 204);
+       System.out.println("Response Code from the Server is :" + code);
+       Assert.assertEquals(code, 200);
 
 
     }
+    @Test
+    public void deleteGist() {
+
+        RestAssured.baseURI = "https://www.api.github.com/";
+        given().urlEncodingEnabled(true)
+                .param("username", "vvkishor")
+                .param("password", "Mymilky1")
+                .header("Accept", ContentType.JSON.getAcceptHeader())
+                .post("/delete/gists/gist_id")
+                .then().statusCode(405);
+    }
+
+
 
 }
 
